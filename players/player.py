@@ -25,12 +25,9 @@ class Player():
         hand_descr = 'Hand'
         cards_descr = ', '.join(str(card) for card in self.hand.get_cards())
         bet_descr = f'Bet: {self.hand.get_bet()}'
+        value_descr = self.get_current_total()
 
-        card_values = filter(
-            lambda v: self.game_rules.valid_value(v), self.hand.get_values())
-        values_descr = '/'.join(str(v) for v in card_values)
-
-        return f'{hand_descr}: {cards_descr} = {values_descr}. {bet_descr}'
+        return f'{hand_descr}: {cards_descr} = {value_descr}. {bet_descr}'
 
     def add_game(self, game):
         self.blackjack_game = game
@@ -52,6 +49,12 @@ class Player():
 
     def get_hand(self):
         return self.hand
+
+    def get_current_total(self):
+        all_values = self.hand.get_values()
+        valid_values = list(
+            filter(lambda v: self.game_rules.valid_value(v), all_values))
+        return min(all_values) if not valid_values else max(valid_values)
 
     def _get_bet(self):
         bet = int(input(self._bet_input_string))

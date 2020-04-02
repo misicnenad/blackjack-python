@@ -17,18 +17,14 @@ class Dealer(Player):
         hand_descr = 'Hand'
         hand_descr += ': ' + ', '.join(str(card)
                                        for card in self.hand.get_cards())
+        value_descr = self.get_current_total()
 
-        card_values = list(
-            filter(lambda v: self.game_rules.valid_value(v), self.hand.get_values()))
-
-        if not card_values:
-            return hand_descr
-
-        values_descr = '/'.join(str(v) for v in card_values)
-
-        return f'{hand_descr} = {values_descr}.'
+        return f'{hand_descr} = {value_descr}'
 
     def get_card(self):
+        if not self.has_cards():
+            self.refill_playing_deck()
+
         return self.playing_deck.get_card()
 
     def has_cards(self):
