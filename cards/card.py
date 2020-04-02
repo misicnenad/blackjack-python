@@ -18,8 +18,7 @@ class Card():
     def __str__(self):
         rank = self._rank_to_string()
         suit = self.suit.name.capitalize()
-        values = ', '.join(self.values)
-        descr = f'{rank} of {suit} ({values})' if not self.face_down else self._face_down_descr
+        descr = f'{rank} of {suit}' if not self.face_down else self._face_down_descr
         return descr
 
     def __hash__(self):
@@ -42,8 +41,11 @@ class Card():
 
         return self.rank.name.capitalize()
 
-    def show_card(self):
+    def set_face_up(self):
         self.face_down = False
 
-    def hide_card(self):
+    def set_face_down(self):
         self.face_down = True
+
+    def get_values(self):
+        return self.values if not self.face_down else []

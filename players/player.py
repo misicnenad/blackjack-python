@@ -12,22 +12,31 @@ class Player():
     _min_budget_warning_descr = "Input more money. Minimum budget is {}"
     _min_budget = 100
 
-    def __init__(self, name, blackjack_game, budget=_min_budget):
+    def __init__(self, name, game_rules, budget=None):
         self.name = name
-        self.budget = budget
-        self.blackjack_game = blackjack_game
+        self.budget = budget if budget != None else game_rules.get_minimum_budget()
+        self.game_rules = game_rules
 
         self.hand = Hand()
-        self.blackjack_game.add_player(self)
 
     def __str__(self):
+        if not self.hand.get_cards():
+            return f'{self.name} hand empty'
         hand_descr = 'Hand'
-        cards_descr = ', '.join(card for card in self.hand.get_cards())
+        cards_descr = ', '.join(str(card) for card in self.hand.get_cards())
         bet_descr = f'Bet: {self.hand.get_bet()}'
-        return f'{hand_descr}: {cards_descr}. {bet_descr}'
+
+        card_values = filter(
+            lambda v: self.game_rules.valid_value(v), self.hand.get_values())
+        values_descr = '/'.join(str(v) for v in card_values)
+
+        return f'{hand_descr}: {cards_descr} = {values_descr}. {bet_descr}'
+
+    def add_game(self, game):
+        self.blackjack_game = game
 
     def place_bet(self):
-        print(f'Player {self.name}: your budget is {self.budget}.')
+        print(f'{self.name}: your budget is {self.budget}.')
         if not self.budget:
             answer = input(self._play_again_descr)
             if answer != 'y':
@@ -62,4 +71,7 @@ class Player():
             print(self._min_budget_warning_descr.format(self._min_budget))
             self._add_budget()
 
-        self.budget = budget 
+        self.budget = budget
+
+    def add_card(self, card):
+        self.hand.add_card(card)

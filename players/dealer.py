@@ -4,15 +4,29 @@ from deck import Deck
 
 class Dealer(Player):
 
-    def __init__(self, name, blackjack_game, game_rules):
-        super(Dealer, self).__init__(name, blackjack_game, budget=0)
+    name = "Dealer"
+
+    def __init__(self, game_rules):
+        super(Dealer, self).__init__(self.name, game_rules, budget=0)
         self.playing_deck = game_rules.get_playing_deck()
         self.discard_deck = Deck()
 
     def __str__(self):
+        if not self.hand.get_cards():
+            return f'{self.name} hand empty'
         hand_descr = 'Hand'
-        cards_descr = ', '.join(card for card in self.hand.get_cards())
-        return f'{hand_descr}: {cards_descr}'
+        hand_descr += ': ' + ', '.join(str(card)
+                                       for card in self.hand.get_cards())
+
+        card_values = list(
+            filter(lambda v: self.game_rules.valid_value(v), self.hand.get_values()))
+
+        if not card_values:
+            return hand_descr
+
+        values_descr = '/'.join(str(v) for v in card_values)
+
+        return f'{hand_descr} = {values_descr}.'
 
     def deal_initial_hands(self):
         while self.playing_deck.has_cards() and not self.blackjack_game.hands_initialized():
