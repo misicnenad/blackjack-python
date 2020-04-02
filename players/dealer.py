@@ -28,13 +28,11 @@ class Dealer(Player):
 
         return f'{hand_descr} = {values_descr}.'
 
-    def deal_initial_hands(self):
-        while self.playing_deck.has_cards() and not self.blackjack_game.hands_initialized():
-            card = self.playing_deck.get_card()
-            self.blackjack_game.deal_card(card)
+    def get_card(self):
+        return self.playing_deck.get_card()
 
-        if not self.playing_deck.has_cards() and not self.blackjack_game.hands_initialized():
-            self.refill_playing_deck()
+    def has_cards(self):
+        return self.playing_deck.has_cards()
 
     def refill_playing_deck(self):
         self.playing_deck = self.discard_deck
