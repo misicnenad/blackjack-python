@@ -12,6 +12,13 @@ class GameRules():
     _minimum_cards_in_hand = 2
     _winning_value = 21
     _minimum_budget = 100
+    _dealer_min_stop_drawing_value = 17
+    _blackjack_card_count = 2
+
+    _blackjack_payout_ratio = (3, 2)
+    _push_payout = (1, 1)
+    _default_payout_ratio = (2, 1)
+    _player_bust_payout = 0
 
     def __init__(self):
         card_rank_values = self._init_card_rank_values()
@@ -53,3 +60,46 @@ class GameRules():
 
     def valid_value(self, value):
         return value <= self._winning_value
+
+    def dealer_should_draw(self, dealer):
+        total = dealer.get_current_total()
+        if total < self._dealer_min_stop_drawing_value:
+            return True
+
+        hand = dealer.get_hand()
+        return self.soft(hand) and total == self._dealer_min_stop_drawing_value
+
+    def soft(self, hand):
+        return any(c.get_rank() == CardRank.ACE for c in hand.get_cards())
+        
+    def get_payout(self, player_hand, dealer_hand):
+        player_total = player_hand.get_current_total()
+        dealer_total = dealer_hand.get_current_total()
+        payout_ratio_type = self._default_payout_ratio
+
+        if not self.valid_value(dealer_total):
+            if self.blackjack(player_hand):
+                payout_ratio_type = self._blackjack_payout_ratio
+
+        if player_total < dealer_total:
+            return self._player_bust_payout
+
+        if player_total == dealer_total:
+            payout_ratio_type = self._push_payout
+
+        return self._convert_to_payout(player_total, payout_ratio_type)
+    
+    def _convert_to_payout(self, amount, payout_ratio):
+        return (amount / payout_ratio[1]) * payout_ratio[0]
+
+    def blackjack(self, hand):
+        cards = hand.get_cards()
+        if len(cards) != self._blackjack_card_count or hand.get_current_total() != self._winning_value:
+            return False
+
+        ace = next((c.get_rank() == CardRank.ACE for c in cards), None)
+        ten_value_card = next((c.get_values()[0] == CardRank.TEN.value for c in cards), None)
+        return ace and ten_value_card
+
+    def winning_value(self, value):
+        return value == self._winning_value

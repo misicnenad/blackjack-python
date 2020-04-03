@@ -41,4 +41,7 @@ class Dealer(Player):
         pass
 
     def needs_card(self):
-        return False
+        return self.game_rules.dealer_should_draw(self)
+
+    def reveal_hole_card(self):
+        self.hand.reveal_hole_card()

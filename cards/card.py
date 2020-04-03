@@ -47,5 +47,8 @@ class Card():
     def set_face_down(self):
         self.face_down = True
 
+    def get_rank(self):
+        return self.rank
+
     def get_values(self):
         return self.values if not self.face_down else []

@@ -4,7 +4,8 @@ from cards.card import Card, CardRank, CardSuit
 
 class Hand():
 
-    def __init__(self):
+    def __init__(self, game_rules):
+        self.game_rules = game_rules
         self.cards = []
         self.bet = 0
 
@@ -18,6 +19,16 @@ class Hand():
         card_values = filter(lambda cv: len(cv) > 0,
                              (map(lambda c: c.get_values(), self.cards)))
         return set(map(sum, itertools.product(*card_values)))
+
+    def get_current_total(self):
+        all_values = self.get_values()
+        valid_values = list(
+            filter(lambda v: self.game_rules.valid_value(v), all_values))
+        return min(all_values) if not valid_values else max(valid_values)
+
+    def reveal_hole_card(self):
+        for c in self.cards:
+            c.set_face_up()
 
     def add_bet(self, bet):
         self.bet = bet
