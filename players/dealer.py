@@ -12,14 +12,7 @@ class Dealer(Player):
         self.discard_deck = Deck()
 
     def __str__(self):
-        if not self.hand.get_cards():
-            return f'{self.name} hand empty'
-        hand_descr = 'Hand'
-        hand_descr += ': ' + ', '.join(str(card)
-                                       for card in self.hand.get_cards())
-        value_descr = self.get_current_total()
-
-        return f'{hand_descr} = {value_descr}'
+        return f'{self.name} - {self.hand}'
 
     def get_card(self):
         if not self.has_cards():
@@ -34,7 +27,7 @@ class Dealer(Player):
         self.playing_deck = self.discard_deck
         self.discard_deck = Deck()
 
-    def discard_cards(self, cards):
+    def discard(self, cards):
         self.discard_deck.add_cards(cards)
 
     def place_bet(self):

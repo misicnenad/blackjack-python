@@ -1,4 +1,5 @@
 import itertools
+from decimal import Decimal
 from cards.card import Card, CardRank, CardSuit
 
 
@@ -7,7 +8,18 @@ class Hand():
     def __init__(self, game_rules):
         self.game_rules = game_rules
         self.cards = []
-        self.bet = 0
+        self.bet = Decimal(0)
+
+    def __str__(self):
+        if not self.get_cards():
+            return f'Hand empty'
+        hand_descr = 'Hand'
+        cards_descr = ', '.join(str(card) for card in self.get_cards())
+        bet = self.get_bet() if self.get_bet() > 0 else None
+        bet_descr = f'Bet: {bet}'
+        value_descr = self.get_current_total()
+
+        return f'{hand_descr}: {cards_descr} = {value_descr}. {bet_descr}'
 
     def add_card(self, card):
         self.cards.append(card)

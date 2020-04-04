@@ -1,3 +1,4 @@
+from decimal import Decimal
 from deck import Deck
 from cards.card import Card
 from cards.card_rank import CardRank
@@ -11,14 +12,14 @@ class GameRules():
     _ace_max_value = 11
     _minimum_cards_in_hand = 2
     _winning_value = 21
-    _minimum_budget = 100
+    _minimum_budget = Decimal(100)
     _dealer_min_stop_drawing_value = 17
     _blackjack_card_count = 2
 
     _blackjack_payout_ratio = (3, 2)
     _push_payout = (1, 1)
     _default_payout_ratio = (2, 1)
-    _player_bust_payout = 0
+    _player_bust_payout_ratio = (0, 1)
 
     def __init__(self):
         card_rank_values = self._init_card_rank_values()
@@ -77,17 +78,19 @@ class GameRules():
         dealer_total = dealer_hand.get_current_total()
         payout_ratio_type = self._default_payout_ratio
 
-        if not self.valid_value(dealer_total):
-            if self.blackjack(player_hand):
-                payout_ratio_type = self._blackjack_payout_ratio
-
-        if player_total < dealer_total:
-            return self._player_bust_payout
-
-        if player_total == dealer_total:
+        if not self.valid_value(player_total):
+            payout_ratio_type = self._player_bust_payout_ratio
+        elif self.blackjack(player_hand) and not self.blackjack(dealer_hand):
+            payout_ratio_type = self._blackjack_payout_ratio
+        elif not self.valid_value(dealer_total):
+            pass 
+        elif player_total < dealer_total:
+            payout_ratio_type = self._player_bust_payout_ratio
+        elif player_total == dealer_total:
             payout_ratio_type = self._push_payout
 
-        return self._convert_to_payout(player_total, payout_ratio_type)
+        player_bet = player_hand.get_bet()
+        return self._convert_to_payout(player_bet, payout_ratio_type)
     
     def _convert_to_payout(self, amount, payout_ratio):
         return (amount / payout_ratio[1]) * payout_ratio[0]
@@ -99,7 +102,7 @@ class GameRules():
 
         ace = next((c.get_rank() == CardRank.ACE for c in cards), None)
         ten_value_card = next((c.get_values()[0] == CardRank.TEN.value for c in cards), None)
-        return ace and ten_value_card
+        return ace is not ten_value_card is not None
 
     def winning_value(self, value):
         return value == self._winning_value

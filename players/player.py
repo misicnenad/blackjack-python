@@ -1,3 +1,4 @@
+from decimal import Decimal
 from .hand import Hand
 
 
@@ -21,14 +22,9 @@ class Player():
         self.hand = Hand(game_rules)
 
     def __str__(self):
-        if not self.hand.get_cards():
-            return f'{self.name} hand empty'
-        hand_descr = 'Hand'
-        cards_descr = ', '.join(str(card) for card in self.hand.get_cards())
-        bet_descr = f'Bet: {self.hand.get_bet()}'
-        value_descr = self.get_current_total()
+        budget_descr = f'{self.name} - Budget: {self.budget}'
 
-        return f'{hand_descr}: {cards_descr} = {value_descr}. {bet_descr}'
+        return f'{budget_descr}. {self.hand}'
 
     def get_name(self):
         return self.name
@@ -59,10 +55,11 @@ class Player():
         return self.hand.get_current_total()
 
     def _input_bet(self):
-        bet = int(input(self._bet_input_string))
+        text = self._bet_input_string.format(self.name)
+        bet = Decimal(input(text))
         while bet > self.budget:
             print(self._bet_again_descr)
-            bet = int(input(self._bet_input_string))
+            bet = Decimal(input(text))
 
         return bet
 
@@ -74,10 +71,10 @@ class Player():
         return answer == 'y'
 
     def _input_budget(self):
-        budget = int(input(self._add_budget_descr.format(self._min_budget)))
+        budget = Decimal(input(self._add_budget_descr.format(self._min_budget)))
         while budget < self._min_budget:
             print(self._min_budget_warning_descr.format(self._min_budget))
-            budget = int(input(self._add_budget_descr.format(self._min_budget)))
+            budget = Decimal(input(self._add_budget_descr.format(self._min_budget)))
 
         self.budget = budget
 
@@ -91,4 +88,4 @@ class Player():
         self.hand = Hand(self.game_rules)
 
     def wants_to_play(self):
-        return input(self._play_again_descr) == 'y'
+        return input(self._play_again_descr.format(self.name)) == 'y'

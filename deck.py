@@ -15,7 +15,8 @@ class Deck():
         shuffle(self.cards)
 
     def has_cards(self):
-        return bool(self.cards)
+        h = bool(self.cards)
+        return h
 
     def reshuffle_deck(self):
         shuffle(self.cards)
